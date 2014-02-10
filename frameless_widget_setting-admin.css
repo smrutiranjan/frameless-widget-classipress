@@ -1,0 +1,19 @@
+@charset "utf-8";
+/* CSS Document */
+fieldset{
+	border:1px solid #999;
+	padding:10px;
+	margin-bottom:10px;
+}
+.csstxt{
+	width:98%;
+	height:400px;
+	overflow:scroll;
+}
+.msg{
+	color:blue;
+	font-weight:bold;
+	font-size:13px;
+	padding:5px 0 0 0;
+	text-align:center;
+}
