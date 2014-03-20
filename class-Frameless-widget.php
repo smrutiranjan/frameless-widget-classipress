@@ -2,13 +2,13 @@
 /**
  * Frameless Widget Class
  *
- * @since 0.1
+ * @since 1.1
  */
 class Frameless_Widget extends WP_Widget {
 
 	function __construct() {
 		$widget_ops = array('classname' => 'Frameless_widget', 'description' => __('Frameless or HTML or Plain Text', Frameless_WIDGET_TEXT_DOMAIN));
-		$control_ops = array('width' => 400, 'height' => 350);
+		$control_ops = array('width' => 400, 'height' => 350);		
 		parent::__construct('Frameless-widget', __('Frameless Widget', Frameless_WIDGET_TEXT_DOMAIN), $widget_ops, $control_ops);
 	}
 
@@ -17,18 +17,60 @@ class Frameless_Widget extends WP_Widget {
 		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance, $this->id_base );
 		$text = do_shortcode(apply_filters( 'widget_text', empty( $instance['text'] ) ? '' : $instance['text'], $instance ));
 		echo $before_widget;
-		if($text == 1){$this->form1($title);}
-		if($text == 2){$this->form2($title);}
-		if($text == 3){$this->form3($title);}
+		$setlang=$instance['setlang'];
+		if($setlang == 'en')
+		{
+			$pickuplocation_lvl=get_option("pickuplocation_en");
+			$pickupdate_lvl=get_option("pickupdate_en");
+			$dropofflocation_lvl=get_option("dropofflocation_en");
+			$dropoffdate_lvl=get_option("dropoffdate_en");
+			$headerimgurl=plugins_url('/upload/'.get_option( 'form'.$text.'_header_img_en'), __FILE__);
+		}
+		elseif($setlang == 'ge')
+		{
+			$pickuplocation_lvl=get_option("pickuplocation_da");
+			$pickupdate_lvl=get_option("pickupdate_da");
+			$dropofflocation_lvl=get_option("dropofflocation_da");
+			$dropoffdate_lvl=get_option("dropoffdate_da");
+			$headerimgurl=plugins_url('/upload/'.get_option( 'form'.$text.'_header_img_ge'), __FILE__);
+		}
+		elseif($setlang == 'fr')
+		{
+			$pickuplocation_lvl=get_option("pickuplocation_fr");
+			$pickupdate_lvl=get_option("pickupdate_fr");
+			$dropofflocation_lvl=get_option("dropofflocation_fr");
+			$dropoffdate_lvl=get_option("dropoffdate_fr");
+				$headerimgurl=plugins_url('/upload/'.get_option( 'form'.$text.'_header_img_fr'), __FILE__);
+		}
+		elseif($setlang == 'du')
+		{
+			$pickuplocation_lvl=get_option("pickuplocation_du");
+			$pickupdate_lvl=get_option("pickupdate_du");
+			$dropofflocation_lvl=get_option("dropofflocation_du");
+			$dropoffdate_lvl=get_option("dropoffdate_du");
+				$headerimgurl=plugins_url('/upload/'.get_option( 'form'.$text.'_header_img_du'), __FILE__);
+		}
+		else
+		{
+			$pickuplocation_lvl=get_option("pickuplocation_en");
+			$pickupdate_lvl=get_option("pickupdate_en");
+			$dropofflocation_lvl=get_option("dropofflocation_en");
+			$dropoffdate_lvl=get_option("dropoffdate_en");
+				$headerimgurl=plugins_url('/upload/'.get_option( 'form'.$text.'_header_img_en'), __FILE__);
+		}
+		if($text == 1){$this->form1($setlang,$title,$headerimgurl,$pickuplocation_lvl,$pickupdate_lvl,$dropofflocation_lvl,$dropoffdate_lvl);}
+		if($text == 2){$this->form2($setlang,$title,$headerimgurl,$pickuplocation_lvl,$pickupdate_lvl,$dropofflocation_lvl,$dropoffdate_lvl);}
+		if($text == 3){$this->form3($setlang,$title,$headerimgurl,$pickuplocation_lvl,$pickupdate_lvl,$dropofflocation_lvl,$dropoffdate_lvl);}
         echo $after_widget;
         }
-	function form1($title)
+	function form1($lang,$title,$headerimgurl,$pickuplocation_lvl,$pickupdate_lvl,$dropofflocation_lvl,$dropoffdate_lvl)
 	{
 		?>
 		  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" />
           <link type="text/css" rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
-          <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script-->
+         <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
           <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+		   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/i18n/jquery-ui-i18n.min.js"></script>	
           <script src="<?php echo plugins_url('jquery.selectBoxIt.js', __FILE__);?>"></script> 
 			<style>
             <?php echo get_option('form1_css');?>	
@@ -40,6 +82,13 @@ class Frameless_Widget extends WP_Widget {
             </style>
 			<script>
 			jQuery( document ).ready(function($) {
+			<?php 
+			if($lang == 'en') { echo '$.datepicker.setDefaults( $.datepicker.regional[""] );';}
+			else if($lang == 'ge') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "de" ] );';}
+			else if($lang == 'fr') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "fr" ] );';}
+			else if($lang == 'du') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "nl" ] );';}
+			else { echo '$.datepicker.setDefaults( $.datepicker.regional[ "" ] );';}
+			?>
 			function getsc()
 			{
 				var widths=$(window).width();			
@@ -62,11 +111,12 @@ class Frameless_Widget extends WP_Widget {
 				getsc();
 			$("#PickupLocationID,#DropoffLocationID").selectBoxIt({
 			
-			// Uses the jQueryUI theme for the drop down
-			theme: "jquerymobile",
+			// Uses the $UI theme for the drop down
+			theme: "$mobile",
 			
 			
 			});
+		   $("#date_input_4,#date_input_6").datepicker();
            $("#txtStartDate_div").datepicker({ 
 				showOn: "button",
         		buttonImage: "<?php echo plugins_url('cal.gif', __FILE__);?>",
@@ -137,49 +187,49 @@ class Frameless_Widget extends WP_Widget {
             </script>           
             <div class="textwidget" id="frameless_widget_section">
             <div class="clear5"></div>
-            <div class="frameless_widget_div" data-role="content">
+            <div class="frameless_widget_div" data-role="content" style="background-image:url('<?php echo plugins_url('/upload/'.get_option( 'form1_wg_bg_img') , __FILE__ );?>');background-color:<?php echo get_option('form1_wg_bg_color');?>;border:2px solid <?php echo get_option('form1_wg_bg_color');?>">
                 <div class="form1">
                 <form target="_blank" id="theform" action="https://secure.rentalcarmanager.com.au/ssl/AUTravelWheels107/bondi/webstep2.asp?refid=&amp;URL=" name="theform" method="post">				
                 <?php
-				if(get_option( 'form1_header_img')!=""){?>
-                <div align="center"><img src="<?php echo plugins_url( 'frameless-widget/upload/'.get_option( 'form1_header_img') , dirname(__FILE__) );?>" border="0"/></div><?php } else {?><h1><?php echo $title; ?></h1><?php } ?>
+				if($headerimgurl!=""){?>
+                <div align="center"><img src="<?php echo $headerimgurl;?>" border="0"/></div><?php } else {?><h1><?php echo $title; ?></h1><?php } ?>
                 <div class="clear5"></div>                    
-            <label>Pickup Location</label>
-            <select  name="PickupLocationID" id="PickupLocationID">
-               <option value="28">Adelaide &nbsp;</option>
-               <option value="33">Brisbane &nbsp;</option>
-               <option value="36">Cairns &nbsp;</option>
-               <option value="12">Darwin &nbsp;</option>
-               <option value="4">Melbourne &nbsp;</option>
-               <option value="9">Perth &nbsp;</option>
-               <option selected="selected" value="1">Sydney &nbsp;</option>
-            </select>       
-        <div class="clear5"></div>        
-         <label>Pickup Date</label>
-           <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset ui-shadow ui-btn-up-c"> <input  type="text" id="txtStartDate" data-theme="a" value="<?php echo date("d/m/Y",strtotime("+2 day"));?>"/><input  type="hidden" id="txtStartDate_div"/></div>
-       <!-- </div>-->
-        <div class="clear5"></div>                  
-            <label>Dropoff Location</label>
-            <select name="DropoffLocationID" id="DropoffLocationID">               
-               <option value="Same" selected="selected">Same As Pickup</option>
-               <option value="28">Adelaide &nbsp;</option>
-               <option value="33">Brisbane &nbsp;</option>
-               <option value="36">Cairns &nbsp;</option>
-               <option value="12">Darwin &nbsp;</option>
-               <option value="4">Melbourne &nbsp;</option>
-               <option value="9">Perth &nbsp;</option>
-               <option value="1">Sydney &nbsp;</option>
-            </select>
-        <div class="clear5"></div>
-         <label>Dropoff Date</label>
-           <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset ui-shadow ui-btn-up-c"><input type="text" id="txtEndDate" data-role="date" value="<?php echo date("d/m/Y",strtotime("+16 day"));?>"/><input type="hidden" id="txtEndDate_div"/></div>
-        <!--</div>-->
-         <div class="clear5"></div>
-          <input type="hidden" value="9" name="CategoryTypeID"/>
-		<img border="0" oldsrc="<?php echo plugins_url( 'frameless-widget/search.png' , dirname(__FILE__) );?>" srcover="<?php echo plugins_url( 'frameless-widget/search_ho.png' , dirname(__FILE__) );?>" src="<?php echo plugins_url( 'frameless-widget/search.png' , dirname(__FILE__) );?>" onclick="updatefield();document.getElementById('theform').submit();" style="box-shadow:none;border:none;border-radius:none;"/>
+            <div class="col col-1">
+                <label><?php echo $pickuplocation_lvl;?></label><div class="clear2"></div>
+                <select  name="PickupLocationID" id="PickupLocationID">
+                <option value="28">Adelaide &nbsp;</option>
+                <option value="33">Brisbane &nbsp;</option>
+                <option value="36">Cairns &nbsp;</option>
+                <option value="12">Darwin &nbsp;</option>
+                <option value="4">Melbourne &nbsp;</option>
+                <option value="9">Perth &nbsp;</option>
+                <option selected="selected" value="1">Sydney &nbsp;</option>
+                </select>    <div class="clear5"></div>
+               	<label><?php echo $dropofflocation_lvl;?></label><div class="clear2"></div>
+                <select name="DropoffLocationID" id="DropoffLocationID">               
+                   <option value="Same" selected="selected">Same As Pickup</option>
+                   <option value="28">Adelaide &nbsp;</option>
+                   <option value="33">Brisbane &nbsp;</option>
+                   <option value="36">Cairns &nbsp;</option>
+                   <option value="12">Darwin &nbsp;</option>
+                   <option value="4">Melbourne &nbsp;</option>
+                   <option value="9">Perth &nbsp;</option>
+                   <option value="1">Sydney &nbsp;</option>
+                </select>
+        	</div>
+       		<div class="col col-2">   
+                 <label><?php echo $pickupdate_lvl;?></label><div class="clear2"></div>
+                <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset ui-shadow ui-btn-up-c"> <input  type="text" id="txtStartDate" data-theme="a" value="<?php echo date("d/m/Y",strtotime("+2 day"));?>"/><input  type="hidden" id="txtStartDate_div"/></div>
+       			 <div class="clear5"></div>
+         		<label><?php echo $dropoffdate_lvl;?></label><div class="clear2"></div>
+           		<div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset ui-shadow ui-btn-up-c"><input type="text" id="txtEndDate" data-role="date" value="<?php echo date("d/m/Y",strtotime("+16 day"));?>"/><input type="hidden" id="txtEndDate_div"/></div>        
+         		<div class="clear5"></div>
+         		<input type="hidden" value="9" name="CategoryTypeID"/>
+		<img border="0" oldsrc="<?php echo plugins_url( 'search.png' ,__FILE__ );?>" srcover="<?php echo plugins_url( 'search_ho.png' ,__FILE__);?>" src="<?php echo plugins_url( 'search.png' , __FILE__ );?>" onclick="updatefield();document.getElementById('theform').submit();" style="box-shadow:none;border:none;border-radius:none;"/>
          <!--<input value="Search" data-theme="b" type="submit" style="width:100%" class="ui-button ui-widget ui-state-default ui-corner-all"/-->
          <input type="hidden" name="PickupDay" id="PickupDay"/><input type="hidden" name="PickupMonth" id="PickupMonth"/><input type="hidden" name="PickupYear" id="PickupYear"/>
          <input type="hidden" name="DropoffDay" id="DropoffDay"/><input type="hidden" name="DropoffMonth" id="DropoffMonth"/><input type="hidden" name="DropoffYear" id="DropoffYear"/>
+         </div>
          <div class="clear5"></div>
          </form>
     			</div>
@@ -188,13 +238,14 @@ class Frameless_Widget extends WP_Widget {
 			</div>
         <?php
 	}
-	function form2($title)
+	function form2($lang,$title,$headerimgurl,$pickuplocation_lvl,$pickupdate_lvl,$dropofflocation_lvl,$dropoffdate_lvl)
 	{
 		?>
        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
 		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
         <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/i18n/jquery-ui-i18n.min.js"></script>	
         <script src="<?php echo plugins_url('jquery.selectBox.js', __FILE__);?>"></script> 
 			<style>
             <?php echo get_option('form2_css');?>
@@ -220,6 +271,13 @@ class Frameless_Widget extends WP_Widget {
 			}
             $(function() {	
 				getsc();
+				<?php 
+			if($lang == 'en') { echo '$.datepicker.setDefaults( $.datepicker.regional[""] );';}
+			else if($lang == 'ge') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "de" ] );';}
+			else if($lang == 'fr') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "fr" ] );';}
+			else if($lang == 'du') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "nl" ] );';}
+			else { echo '$.datepicker.setDefaults( $.datepicker.regional[ "" ] );';}
+			?>
               $('#txtStartDate,#txtEndDate').datepicker(
 			   { 
 				 minDate: 0,
@@ -304,11 +362,11 @@ class Frameless_Widget extends WP_Widget {
             </script>
             <div class="textwidget" id="frameless_widget_section">
             <div class="clear5"></div>
-            <div class="frameless_widget_div" >
+            <div class="frameless_widget_div" style="background-image:url('<?php echo plugins_url('/upload/'.get_option( 'form2_wg_bg_img') , __FILE__ );?>');background-color:<?php echo get_option('form2_wg_bg_color');?>;border:2px solid <?php echo get_option('form2_wg_bg_color');?>">
                <form target="_blank" id="theform" action="https://secure.rentalcarmanager.com.au/ssl/AUTravelWheels107/bondi/webstep2.asp?refid=&amp;URL=" name="theform" method="post">
     	 <?php
-				if(get_option( 'form2_header_img')!=""){?>
-                <div align="left"><img src="<?php echo plugins_url( 'frameless-widget/upload/'.get_option( 'form2_header_img') , dirname(__FILE__) );?>" border="0"/></div><?php } else {?><h1><?php echo $title; ?></h1><?php } ?>
+				if($headerimgurl!=""){?>
+                <div align="left"><img src="<?php echo $headerimgurl;?>" border="0"/></div><?php } else {?><h1><?php echo $title; ?></h1><?php } ?>
         <div class="clear5"></div><div class="clear5"></div>                              
             <select  name="PickupLocationID" id="PickupLocationID" data-mini="true" class="sel">
                <option value="28">Adelaide &nbsp;</option>
@@ -353,13 +411,14 @@ class Frameless_Widget extends WP_Widget {
 		</div>
         <?php
 	}
-	function form3($title)
+	function form3($lang,$title,$headerimgurl,$pickuplocation_lvl,$pickupdate_lvl,$dropofflocation_lvl,$dropoffdate_lvl)
 	{
 		?>
         	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
             <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
             <script src="//code.jquery.com/jquery-1.10.2.js"></script>
             <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+            <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/i18n/jquery-ui-i18n.min.js"></script>	
             <script src="<?php echo plugins_url('jquery.selectric.js', __FILE__);?>"></script>            
 			<style>
             <?php echo get_option('form3_css');?>
@@ -385,6 +444,13 @@ class Frameless_Widget extends WP_Widget {
 			}
             $(function() {	
 			getsc();
+			<?php 
+			if($lang == 'en') { echo '$.datepicker.setDefaults( $.datepicker.regional[""] );';}
+			else if($lang == 'ge') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "de" ] );';}
+			else if($lang == 'fr') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "fr" ] );';}
+			else if($lang == 'du') { echo '$.datepicker.setDefaults( $.datepicker.regional[ "nl" ] );';}
+			else { echo '$.datepicker.setDefaults( $.datepicker.regional[ "" ] );';}
+			?>
 			  $("#txtStartDate_div").datepicker({ 
 				showOn: "button",
         		buttonImage: "<?php echo plugins_url('cal1.gif', __FILE__);?>",
@@ -454,14 +520,13 @@ class Frameless_Widget extends WP_Widget {
             </script>
             <div class="textwidget" id="frameless_widget_section">
             <div class="clear5"></div>
-            <div class="frameless_widget_div">
+           <div class="frameless_widget_div" style="background-image:url('<?php echo plugins_url('/upload/'.get_option( 'form3_wg_bg_img') , __FILE__ );?>');background-color:<?php echo get_option('form3_wg_bg_color');?>;border:2px solid <?php echo get_option('form3_wg_bg_color');?>">
                 <form target="_blank" id="theform" action="https://secure.rentalcarmanager.com.au/ssl/AUTravelWheels107/bondi/webstep2.asp?refid=&amp;URL=" name="theform" method="post" onsubmit="updatefield();">
     	<?php
-				if(get_option( 'form3_header_img')!=""){?>
-                <div align="left"><img src="<?php echo plugins_url( 'frameless-widget/upload/'.get_option( 'form3_header_img') , dirname(__FILE__) );?>" border="0"/></div><?php } else {?><h1><?php echo $title; ?></h1><?php } ?>
+				if($headerimgurl!=""){?>
+                <div align="left"><img src="<?php echo $headerimgurl;?>" border="0"/></div><?php } else {?><h1><?php echo $title; ?></h1><?php } ?>
         <div class="clear5"></div><div class="clear5"></div>
-        <div class="col1">            
-            Pickup Location
+        <div class="col1"><?php echo $pickuplocation_lvl;?>
             <select  name="PickupLocationID" id="PickupLocationID" data-mini="true" data-icon="arrow-d">               
                <option value="28">Adelaide &nbsp;</option>
                <option value="33">Brisbane &nbsp;</option>
@@ -472,14 +537,12 @@ class Frameless_Widget extends WP_Widget {
                <option value="1" selected="selected">Sydney &nbsp;</option>
             </select>           
         </div>
-        <div class="col2">         
-         Pickup Date
+        <div class="col2"> <?php echo $pickupdate_lvl;?>
          <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset ui-shadow ui-btn-up-c" style="background: none repeat scroll 0 0 #FFFFFF;border-color: #DDDDDD;color: #333333;
     text-shadow: 0 1px 0 #F3F3F3;width:100%;padding:2px 0;display:block;float:right;margin:10px 0;"><input type="text" id="txtStartDate" value="<?php echo date("d/m/Y",strtotime("+2 day"));?>"/><input type="hidden" id="txtStartDate_div" /></div>
         </div>
         <div class="clear5"></div>
-         <div class="col1">           
-            Dropoff Location
+         <div class="col1"><?php echo $dropofflocation_lvl;?>
             <select name="DropoffLocationID" id="DropoffLocationID" data-mini="true" data-icon="arrow-d"> 
                <option value="28">Adelaide &nbsp;</option>
                <option value="33">Brisbane &nbsp;</option>
@@ -490,8 +553,7 @@ class Frameless_Widget extends WP_Widget {
                <option value="1" selected="selected">Sydney &nbsp;</option>
             </select>
         </div>
-        <div class="col2">
-         Dropoff Date
+        <div class="col2"><?php echo $dropoffdate_lvl;?>
          <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset ui-shadow ui-btn-up-c" style="background: none repeat scroll 0 0 #FFFFFF;border-color: #DDDDDD;color: #333333;
     text-shadow: 0 1px 0 #F3F3F3;width:100%;padding:2px 0;display:block;float:right;margin:10px 0;"><input type="text" id="txtEndDate" value="<?php echo date("d/m/Y",strtotime("+16 day"));?>"/><input type="hidden" id="txtEndDate_div" /></div>
         </div>
@@ -510,6 +572,7 @@ class Frameless_Widget extends WP_Widget {
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags($new_instance['title']);
+		$instance['setlang'] = strip_tags($new_instance['setlang']);
 		if ( current_user_can('unfiltered_html') )
 			$instance['text'] =  $new_instance['text'];
 		else
@@ -519,7 +582,7 @@ class Frameless_Widget extends WP_Widget {
 	}
 
 	function form( $instance ) {
-		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'text' => '' ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'text' => '','setlang' =>'' ) );
 		$title = strip_tags($instance['title']);
 		$text = esc_textarea($instance['text']);		
 ?>
@@ -529,6 +592,13 @@ class Frameless_Widget extends WP_Widget {
         	<option value="1" <?php if($instance['text'] == '1'){ echo 'selected';}?>>Layout1</option>
             <option value="2" <?php if($instance['text'] == '2'){ echo 'selected';}?>>Layout2</option>
             <option value="3" <?php if($instance['text'] == '3'){ echo 'selected';}?>>Layout3</option>
+        </select>
+        </p>
+        <p>Set Language &nbsp;&nbsp;<select id="<?php echo $this->get_field_id('setlang'); ?>" name="<?php echo $this->get_field_name('setlang'); ?>">
+        	<option value="en" <?php if($instance['setlang'] == 'en'){ echo 'selected';}?>>English</option>
+            <option value="ge" <?php if($instance['setlang'] == 'ge'){ echo 'selected';}?>>German</option>
+            <option value="fr" <?php if($instance['setlang'] == 'fr'){ echo 'selected';}?>>France</option>
+             <option value="du" <?php if($instance['setlang'] == 'du'){ echo 'selected';}?>>Netherland</option>
         </select>
         </p>
 		<!--<textarea class="widefat" rows="16" cols="20" id="<?php echo $this->get_field_id('text'); ?>" name="<?php echo $this->get_field_name('text'); ?>"><?php echo $text; ?></textarea>
